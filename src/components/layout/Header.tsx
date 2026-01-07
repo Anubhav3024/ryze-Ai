@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 
 const navLinks = [
   { label: "Product", href: "#features" },
@@ -12,84 +14,173 @@ const navLinks = [
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  
+  useSmoothScroll();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+      
+      // Detect active section
+      const sections = navLinks.map(link => link.href.slice(1));
+      for (const section of sections.reverse()) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 150) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
     };
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <header
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "glass py-3" : "bg-transparent py-5"
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
+        <motion.a 
+          href="#" 
+          className="flex items-center gap-2"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <span className="text-2xl font-bold font-display text-gradient">Ryze</span>
-        </a>
+        </motion.a>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
+          {navLinks.map((link, index) => (
+            <motion.a
               key={link.label}
               href={link.href}
-              className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm font-medium"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + index * 0.1 }}
+              className={`relative text-sm font-medium transition-colors duration-200 ${
+                activeSection === link.href.slice(1) 
+                  ? "text-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               {link.label}
-            </a>
+              {activeSection === link.href.slice(1) && (
+                <motion.div
+                  layoutId="activeSection"
+                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+            </motion.a>
           ))}
         </nav>
 
         {/* CTA Buttons */}
-        <div className="hidden md:flex items-center gap-3">
+        <motion.div 
+          className="hidden md:flex items-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <Button variant="ghost" size="sm">
             Login
           </Button>
-          <Button variant="hero" size="default">
-            Book a Demo
-          </Button>
-        </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="hero" size="default">
+              Book a Demo
+            </Button>
+          </motion.div>
+        </motion.div>
 
         {/* Mobile Menu Button */}
-        <button
+        <motion.button
           className="md:hidden p-2 text-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          whileTap={{ scale: 0.9 }}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          <AnimatePresence mode="wait">
+            {isMobileMenuOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={24} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu size={24} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
       </div>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden glass mt-2 mx-4 rounded-xl p-4 animate-scale-in">
-          <nav className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors py-2 text-sm font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="md:hidden glass mt-2 mx-4 rounded-xl overflow-hidden"
+          >
+            <nav className="flex flex-col gap-1 p-4">
+              {navLinks.map((link, index) => (
+                <motion.a
+                  key={link.label}
+                  href={link.href}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
+                    activeSection === link.href.slice(1)
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </motion.a>
+              ))}
+              <motion.div 
+                className="flex flex-col gap-2 mt-3 pt-3 border-t border-border"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
               >
-                {link.label}
-              </a>
-            ))}
-            <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
-              <Button variant="ghost" size="sm">
-                Login
-              </Button>
-              <Button variant="hero" size="default">
-                Book a Demo
-              </Button>
-            </div>
-          </nav>
-        </div>
-      )}
-    </header>
+                <Button variant="ghost" size="sm">
+                  Login
+                </Button>
+                <Button variant="hero" size="default">
+                  Book a Demo
+                </Button>
+              </motion.div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }
