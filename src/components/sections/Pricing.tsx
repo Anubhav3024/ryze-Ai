@@ -1,6 +1,8 @@
+import { motion } from "framer-motion";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/animations/AnimatedSection";
 
 const plans = [
   {
@@ -65,7 +67,7 @@ export function Pricing() {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <AnimatedSection className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 block">
             Pricing
           </span>
@@ -77,7 +79,12 @@ export function Pricing() {
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-4 glass rounded-full p-2">
+          <motion.div 
+            className="inline-flex items-center gap-4 glass rounded-full p-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <button
               onClick={() => setIsYearly(false)}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
@@ -97,75 +104,104 @@ export function Pricing() {
                 Save 20%
               </span>
             </button>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatedSection>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative glass rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 ${
-                plan.popular ? "border-2 border-primary shadow-glow" : ""
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <div className="bg-gradient-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                    <Sparkles className="w-4 h-4" />
-                    Most Popular
-                  </div>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <h3 className="text-xl font-bold font-display mb-2">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground">{plan.description}</p>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold font-display">
-                    ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
-                  </span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                {isYearly && (
-                  <p className="text-sm text-success mt-1">
-                    Billed annually (${plan.yearlyPrice * 12}/year)
-                  </p>
-                )}
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-muted-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                variant={plan.popular ? "hero" : "outline"}
-                size="lg"
-                className="w-full"
+        <StaggerContainer className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {plans.map((plan, index) => (
+            <StaggerItem key={plan.name}>
+              <motion.div
+                className={`relative glass rounded-2xl p-8 h-full flex flex-col ${
+                  plan.popular ? "border-2 border-primary shadow-glow" : ""
+                }`}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.3 }}
               >
-                {plan.cta}
-              </Button>
-            </div>
+                {plan.popular && (
+                  <motion.div 
+                    className="absolute -top-4 left-1/2 -translate-x-1/2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="bg-gradient-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                      <Sparkles className="w-4 h-4" />
+                      Most Popular
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="mb-6">
+                  <h3 className="text-xl font-bold font-display mb-2">{plan.name}</h3>
+                  <p className="text-sm text-muted-foreground">{plan.description}</p>
+                </div>
+
+                <div className="mb-6">
+                  <motion.div 
+                    className="flex items-baseline gap-1"
+                    key={isYearly ? "yearly" : "monthly"}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <span className="text-4xl font-bold font-display">
+                      ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
+                    </span>
+                    <span className="text-muted-foreground">/month</span>
+                  </motion.div>
+                  {isYearly && (
+                    <motion.p 
+                      className="text-sm text-success mt-1"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      Billed annually (${plan.yearlyPrice * 12}/year)
+                    </motion.p>
+                  )}
+                </div>
+
+                <ul className="space-y-3 mb-8 flex-1">
+                  {plan.features.map((feature, featureIndex) => (
+                    <motion.li 
+                      key={feature} 
+                      className="flex items-start gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: featureIndex * 0.05 }}
+                      viewport={{ once: true }}
+                    >
+                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-muted-foreground">{feature}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                <Button
+                  variant={plan.popular ? "hero" : "outline"}
+                  size="lg"
+                  className="w-full"
+                >
+                  {plan.cta}
+                </Button>
+              </motion.div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* Enterprise CTA */}
-        <div className="text-center mt-12">
+        <AnimatedSection delay={0.4} className="text-center mt-12">
           <p className="text-muted-foreground">
             Need a custom solution?{" "}
-            <a href="#" className="text-primary font-medium hover:underline">
+            <motion.a 
+              href="#" 
+              className="text-primary font-medium hover:underline"
+              whileHover={{ scale: 1.05 }}
+            >
               Contact our sales team
-            </a>
+            </motion.a>
           </p>
-        </div>
+        </AnimatedSection>
       </div>
     </section>
   );
