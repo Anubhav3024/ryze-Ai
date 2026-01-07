@@ -1,5 +1,7 @@
-import { Star, Quote } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { AnimatedSection } from "@/components/animations/AnimatedSection";
 
 const testimonials = [
   {
@@ -44,6 +46,14 @@ const logos = [
 export function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const nextTestimonial = () => {
+    setActiveIndex((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
   return (
     <section id="testimonials" className="py-24 relative overflow-hidden">
       {/* Background */}
@@ -52,7 +62,7 @@ export function Testimonials() {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <AnimatedSection className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 block">
             Testimonials
           </span>
@@ -63,76 +73,140 @@ export function Testimonials() {
             Join hundreds of agencies and brands that have transformed their 
             advertising performance with Ryze AI.
           </p>
-        </div>
+        </AnimatedSection>
 
         {/* Testimonials Carousel */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <div className="glass rounded-3xl p-8 md:p-12 relative">
+        <AnimatedSection delay={0.2} className="max-w-4xl mx-auto mb-16">
+          <motion.div 
+            className="glass rounded-3xl p-8 md:p-12 relative overflow-hidden"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.3 }}
+          >
             <Quote className="absolute top-6 left-6 w-12 h-12 text-primary/20" />
             
             {/* Active Testimonial */}
             <div className="relative z-10">
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-warning text-warning" />
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <Star className="w-5 h-5 fill-warning text-warning" />
+                  </motion.div>
                 ))}
               </div>
 
-              <blockquote className="text-xl md:text-2xl font-medium leading-relaxed mb-8">
-                "{testimonials[activeIndex].quote}"
-              </blockquote>
+              <AnimatePresence mode="wait">
+                <motion.blockquote
+                  key={activeIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-xl md:text-2xl font-medium leading-relaxed mb-8"
+                >
+                  "{testimonials[activeIndex].quote}"
+                </motion.blockquote>
+              </AnimatePresence>
 
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-lg font-bold text-primary-foreground">
-                    {testimonials[activeIndex].avatar}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeIndex}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex items-center justify-between flex-wrap gap-4"
+                >
+                  <div className="flex items-center gap-4">
+                    <motion.div 
+                      className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-lg font-bold text-primary-foreground"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      {testimonials[activeIndex].avatar}
+                    </motion.div>
+                    <div>
+                      <p className="font-semibold">{testimonials[activeIndex].author}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {testimonials[activeIndex].role} at {testimonials[activeIndex].company}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold">{testimonials[activeIndex].author}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {testimonials[activeIndex].role} at {testimonials[activeIndex].company}
-                    </p>
-                  </div>
-                </div>
-                <div className="glass px-4 py-2 rounded-full">
-                  <span className="text-primary font-bold">{testimonials[activeIndex].result}</span>
-                </div>
-              </div>
+                  <motion.div 
+                    className="glass px-4 py-2 rounded-full"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <span className="text-primary font-bold">{testimonials[activeIndex].result}</span>
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
             </div>
-          </div>
+
+            {/* Navigation Arrows */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none">
+              <motion.button
+                onClick={prevTestimonial}
+                className="w-10 h-10 rounded-full glass flex items-center justify-center pointer-events-auto hover:bg-primary hover:text-primary-foreground transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </motion.button>
+              <motion.button
+                onClick={nextTestimonial}
+                className="w-10 h-10 rounded-full glass flex items-center justify-center pointer-events-auto hover:bg-primary hover:text-primary-foreground transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </motion.button>
+            </div>
+          </motion.div>
 
           {/* Navigation Dots */}
           <div className="flex items-center justify-center gap-3 mt-8">
             {testimonials.map((_, index) => (
-              <button
+              <motion.button
                 key={index}
                 onClick={() => setActiveIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`h-3 rounded-full transition-all duration-300 ${
                   index === activeIndex 
                     ? "bg-primary w-8" 
-                    : "bg-muted hover:bg-muted-foreground"
+                    : "bg-muted w-3 hover:bg-muted-foreground"
                 }`}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
               />
             ))}
           </div>
-        </div>
+        </AnimatedSection>
 
         {/* Logo Cloud */}
-        <div className="border-t border-border pt-12">
-          <p className="text-center text-sm text-muted-foreground mb-8">
-            Trusted by leading companies worldwide
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-            {logos.map((logo) => (
-              <div
-                key={logo}
-                className="text-xl font-bold text-muted-foreground/50 hover:text-muted-foreground transition-colors duration-300"
-              >
-                {logo}
-              </div>
-            ))}
+        <AnimatedSection delay={0.3}>
+          <div className="border-t border-border pt-12">
+            <p className="text-center text-sm text-muted-foreground mb-8">
+              Trusted by leading companies worldwide
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+              {logos.map((logo, index) => (
+                <motion.div
+                  key={logo}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ scale: 1.1, color: "hsl(var(--foreground))" }}
+                  className="text-xl font-bold text-muted-foreground/50 cursor-pointer transition-colors duration-300"
+                >
+                  {logo}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
       </div>
     </section>
   );

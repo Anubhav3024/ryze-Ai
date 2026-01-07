@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { 
   Zap, 
   BarChart3, 
@@ -7,6 +8,7 @@ import {
   Shield,
   ArrowRight
 } from "lucide-react";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/animations/AnimatedSection";
 
 const features = [
   {
@@ -56,7 +58,7 @@ export function Features() {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <AnimatedSection className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 block">
             Features
           </span>
@@ -68,40 +70,47 @@ export function Features() {
             Stop wasting time and money on manual ad management. Let Ryze's AI 
             handle the heavy lifting while you focus on strategy.
           </p>
-        </div>
+        </AnimatedSection>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <div
-              key={feature.title}
-              className="group glass rounded-2xl p-8 hover:shadow-glow transition-all duration-500 hover:-translate-y-1 cursor-pointer"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Icon */}
-              <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                <feature.icon className="w-7 h-7 text-white" />
-              </div>
-
-              {/* Content */}
-              <h3 className="text-xl font-bold font-display mb-3 group-hover:text-primary transition-colors">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                {feature.description}
-              </p>
-
-              {/* Learn More Link */}
-              <a 
-                href="#" 
-                className="inline-flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            <StaggerItem key={feature.title}>
+              <motion.div
+                className="group glass rounded-2xl p-8 hover:shadow-glow transition-all duration-500 cursor-pointer h-full"
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.3 }}
               >
-                Learn more
-                <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-            </div>
+                {/* Icon */}
+                <motion.div 
+                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <feature.icon className="w-7 h-7 text-white" />
+                </motion.div>
+
+                {/* Content */}
+                <h3 className="text-xl font-bold font-display mb-3 group-hover:text-primary transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  {feature.description}
+                </p>
+
+                {/* Learn More Link */}
+                <motion.a 
+                  href="#" 
+                  className="inline-flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  whileHover={{ x: 4 }}
+                >
+                  Learn more
+                  <ArrowRight className="ml-1 w-4 h-4" />
+                </motion.a>
+              </motion.div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
