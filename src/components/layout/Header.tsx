@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { label: "Product", href: "#features" },
@@ -94,6 +95,7 @@ export function Header() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
+          <ThemeToggle />
           <Button variant="ghost" size="sm">
             Login
           </Button>
@@ -170,6 +172,10 @@ export function Header() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
                 <Button variant="ghost" size="sm">
                   Login
                 </Button>
